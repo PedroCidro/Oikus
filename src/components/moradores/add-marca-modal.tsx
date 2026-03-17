@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import type { Perfil } from "@/lib/supabase/types";
+import type { Perfil, Marca, Periodo } from "@/lib/supabase/types";
 
 export function AddMarcaModal({
   houseId,
@@ -30,15 +30,57 @@ export function AddMarcaModal({
     if (!user) return;
 
     const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
 
     await supabase.from("marcas").insert({
       house_id: houseId,
       user_id: target.id,
       reason,
       given_by: user.id,
-      month: now.getMonth() + 1,
-      year: now.getFullYear(),
+      month,
+      year,
     });
+
+    // Check if user hit the mark limit
+    const { data: marcas } = await supabase
+      .from("marcas")
+      .select("id")
+      .eq("house_id", houseId)
+      .eq("user_id", target.id)
+      .eq("month", month)
+      .eq("year", year);
+
+    const { data: periodo } = await supabase
+      .from("periodos")
+      .select("threshold")
+      .eq("house_id", houseId)
+      .eq("month", month)
+      .eq("year", year)
+      .single<Pick<Periodo, "threshold">>();
+
+    const threshold = periodo?.threshold ?? 3;
+    const count = marcas?.length ?? 0;
+
+    if (count >= threshold) {
+      // Check if there's already an open tribunal for this user this month
+      const { data: existing } = await supabase
+        .from("tribunais")
+        .select("id")
+        .eq("house_id", houseId)
+        .eq("accused_id", target.id)
+        .eq("status", "open")
+        .limit(1);
+
+      if (!existing || existing.length === 0) {
+        await supabase.from("tribunais").insert({
+          house_id: houseId,
+          accused_id: target.id,
+          accuser_id: user.id,
+          reason: `Atingiu o limite de ${threshold} marcas em ${month}/${year}`,
+        });
+      }
+    }
 
     onCreated();
   }

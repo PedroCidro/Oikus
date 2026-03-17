@@ -6,12 +6,13 @@ import { createClient } from "@/lib/supabase/client";
 import { ProfileSection } from "@/components/config/profile-section";
 import { SettingsRow } from "@/components/config/settings-row";
 import { ToggleRow } from "@/components/config/toggle-row";
-import type { Perfil, Casa } from "@/lib/supabase/types";
+import type { Perfil, Casa, Periodo } from "@/lib/supabase/types";
 
 export default function ConfigPage() {
   const router = useRouter();
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [house, setHouse] = useState<Casa | null>(null);
+  const [threshold, setThreshold] = useState(3);
   const [notifications, setNotifications] = useState({
     tarefas: true,
     tribunal: true,
@@ -40,6 +41,16 @@ export default function ConfigPage() {
           .eq("id", p.house_id)
           .single<Casa>();
         setHouse(h);
+
+        const now = new Date();
+        const { data: periodo } = await supabase
+          .from("periodos")
+          .select("threshold")
+          .eq("house_id", p.house_id)
+          .eq("month", now.getMonth() + 1)
+          .eq("year", now.getFullYear())
+          .single<Pick<Periodo, "threshold">>();
+        if (periodo) setThreshold(periodo.threshold);
       }
     }
     load();
@@ -92,6 +103,71 @@ export default function ConfigPage() {
           <div className="divide-y divide-surface-dim">
             <SettingsRow label="Nome" value={house.name} />
             <SettingsRow label="Código de convite" value={house.invite_code} />
+            {perfil.role === "admin" && (
+              <>
+                <ToggleRow
+                  label="Aprovar tarefas concluídas"
+                  checked={house.require_approval}
+                  onChange={async (v) => {
+                    const supabase = createClient();
+                    await supabase
+                      .from("casas")
+                      .update({ require_approval: v })
+                      .eq("id", house.id);
+                    setHouse({ ...house, require_approval: v });
+                  }}
+                />
+                <div className="flex items-center justify-between py-3.5">
+                  <span className="text-[15px] font-medium">Limite de marcas</span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={async () => {
+                        if (threshold <= 1) return;
+                        const newVal = threshold - 1;
+                        setThreshold(newVal);
+                        const supabase = createClient();
+                        const now = new Date();
+                        await supabase.from("periodos").upsert(
+                          {
+                            house_id: house.id,
+                            month: now.getMonth() + 1,
+                            year: now.getFullYear(),
+                            threshold: newVal,
+                          },
+                          { onConflict: "house_id,month,year" }
+                        );
+                      }}
+                      className="w-8 h-8 rounded-full bg-surface-dim flex items-center justify-center text-[16px] font-bold text-text-secondary hover:text-text-primary transition-colors"
+                    >
+                      −
+                    </button>
+                    <span className="text-[18px] font-bold w-6 text-center">
+                      {threshold}
+                    </span>
+                    <button
+                      onClick={async () => {
+                        const newVal = threshold + 1;
+                        setThreshold(newVal);
+                        const supabase = createClient();
+                        const now = new Date();
+                        await supabase.from("periodos").upsert(
+                          {
+                            house_id: house.id,
+                            month: now.getMonth() + 1,
+                            year: now.getFullYear(),
+                            threshold: newVal,
+                          },
+                          { onConflict: "house_id,month,year" }
+                        );
+                      }}
+                      className="w-8 h-8 rounded-full bg-surface-dim flex items-center justify-center text-[16px] font-bold text-text-secondary hover:text-text-primary transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </section>
       )}

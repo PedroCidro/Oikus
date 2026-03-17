@@ -2,6 +2,7 @@ export type Casa = {
   id: string;
   name: string;
   invite_code: string;
+  require_approval: boolean;
   created_at: string;
 };
 
@@ -22,7 +23,7 @@ export type Tarefa = {
   description: string | null;
   assigned_to: string | null;
   due_date: string | null;
-  status: "pending" | "completed" | "missed";
+  status: "pending" | "pending_approval" | "completed" | "missed";
   created_by: string;
   created_at: string;
   completed_at: string | null;

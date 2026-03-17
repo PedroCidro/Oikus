@@ -39,9 +39,10 @@ export function formatDueDate(dateStr: string | null): string {
 export function getTaskBadgeVariant(
   status: string,
   dueDate: string | null
-): "feita" | "perdida" | "urgente" | "pendente" {
+): "feita" | "perdida" | "urgente" | "pendente" | "aguardando aprovação" {
   if (status === "completed") return "feita";
   if (status === "missed") return "perdida";
+  if (status === "pending_approval") return "aguardando aprovação";
   if (dueDate) {
     const date = new Date(dueDate + "T00:00:00");
     const today = new Date();

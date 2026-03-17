@@ -6,7 +6,7 @@ import { FilterChips } from "@/components/ui/filter-chips";
 import { TaskRow } from "@/components/tarefas/task-row";
 import { CreateTaskModal } from "@/components/tarefas/create-task-modal";
 import { Button } from "@/components/ui/button";
-import type { Tarefa, Perfil } from "@/lib/supabase/types";
+import type { Tarefa, Perfil, Casa } from "@/lib/supabase/types";
 
 const FILTERS = ["Todas", "Minhas", "Pendentes", "Feitas"];
 
@@ -17,6 +17,8 @@ export default function TarefasPage() {
   const [showModal, setShowModal] = useState(false);
   const [userId, setUserId] = useState("");
   const [houseId, setHouseId] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [requireApproval, setRequireApproval] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -30,12 +32,20 @@ export default function TarefasPage() {
 
     const { data: perfil } = await supabase
       .from("perfis")
-      .select("house_id")
+      .select("house_id, role")
       .eq("id", user.id)
-      .single<Pick<Perfil, "house_id">>();
+      .single<Pick<Perfil, "house_id" | "role">>();
 
     if (!perfil?.house_id) return;
     setHouseId(perfil.house_id);
+    setIsAdmin(perfil.role === "admin");
+
+    const { data: casa } = await supabase
+      .from("casas")
+      .select("require_approval")
+      .eq("id", perfil.house_id)
+      .single<Pick<Casa, "require_approval">>();
+    setRequireApproval(casa?.require_approval ?? true);
 
     const { data: allTasks } = await supabase
       .from("tarefas")
@@ -92,6 +102,8 @@ export default function TarefasPage() {
               key={task.id}
               task={task}
               assignee={task.assigned_to ? memberMap[task.assigned_to] : null}
+              isAdmin={isAdmin}
+              requireApproval={requireApproval}
               onUpdate={fetchData}
             />
           ))

@@ -12,8 +12,9 @@
 CREATE TABLE casas (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name        TEXT NOT NULL,
-  invite_code TEXT UNIQUE NOT NULL,
-  created_at  TIMESTAMPTZ DEFAULT now()
+  invite_code      TEXT UNIQUE NOT NULL,
+  require_approval BOOLEAN NOT NULL DEFAULT true,
+  created_at       TIMESTAMPTZ DEFAULT now()
 );
 
 -- 2. Perfis de usuário (vinculados ao Supabase Auth)
@@ -35,7 +36,7 @@ CREATE TABLE tarefas (
   description   TEXT,
   assigned_to   UUID REFERENCES perfis(id),
   due_date      DATE,
-  status        TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'missed')),
+  status        TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'pending_approval', 'completed', 'missed')),
   created_by    UUID REFERENCES perfis(id) NOT NULL,
   created_at    TIMESTAMPTZ DEFAULT now(),
   completed_at  TIMESTAMPTZ

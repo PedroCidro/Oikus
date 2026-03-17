@@ -1,6 +1,7 @@
 const BADGE_STYLES: Record<string, string> = {
   urgente: "bg-accent-light text-accent",
   pendente: "bg-surface text-text-secondary",
+  "aguardando aprovação": "bg-warning-light text-warning",
   feita: "bg-success-light text-success",
   perdida: "bg-danger-light text-danger",
   punido: "bg-danger-light text-danger",
