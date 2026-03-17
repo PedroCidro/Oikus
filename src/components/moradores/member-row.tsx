@@ -23,12 +23,14 @@ export function MemberRow({
     <div className="flex items-center gap-3 py-3">
       <Avatar name={perfil.name} userId={perfil.id} size={44} />
       <div className="flex-1 min-w-0">
-        <p className="text-[15px] font-semibold truncate">{perfil.name}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-[15px] font-semibold truncate">{perfil.name}</p>
+          <Badge variant={perfil.role} />
+        </div>
         <p className="text-text-secondary text-[13px]">
           {marcaCount} {marcaCount === 1 ? "marca" : "marcas"} este mês
         </p>
       </div>
-      <Badge variant={perfil.role} />
       {isAdmin && !isSelf && (
         <div className="flex items-center gap-2">
           <button
