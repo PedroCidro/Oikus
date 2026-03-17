@@ -83,8 +83,59 @@ export default function PlanejadorPage() {
       excls = data ?? [];
     }
 
+    // Spawn next-week instances for recurring tasks
+    const allMembersList = allMembers ?? [];
+    for (const task of recurring ?? []) {
+      if (!task.due_date || !task.recurrence_group_id) continue;
+
+      const nextDueDate = new Date(task.due_date + "T00:00:00");
+      nextDueDate.setDate(nextDueDate.getDate() + 7);
+      const nextDueStr = nextDueDate.toISOString().split("T")[0];
+
+      // Check if next week's instance already exists
+      const { data: existing } = await supabase
+        .from("tarefas")
+        .select("id")
+        .eq("recurrence_group_id", task.recurrence_group_id)
+        .eq("due_date", nextDueStr)
+        .limit(1);
+
+      if (existing && existing.length > 0) continue;
+
+      // Determine assignee
+      let nextAssignee = task.assigned_to;
+      if (task.cycle_members && task.assigned_to) {
+        const taskExclusions = excls
+          .filter((e) => e.recurrence_group_id === task.recurrence_group_id)
+          .map((e) => e.user_id);
+        const eligible = allMembersList
+          .filter((m) => !taskExclusions.includes(m.id))
+          .sort((a, b) => a.created_at.localeCompare(b.created_at));
+
+        if (eligible.length > 0) {
+          const currentIdx = eligible.findIndex(
+            (m) => m.id === task.assigned_to
+          );
+          const nextIdx = (currentIdx + 1) % eligible.length;
+          nextAssignee = eligible[nextIdx].id;
+        }
+      }
+
+      await supabase.from("tarefas").insert({
+        house_id: perfil.house_id,
+        title: task.title,
+        description: task.description,
+        assigned_to: nextAssignee,
+        due_date: nextDueStr,
+        created_by: task.created_by,
+        is_recurring: true,
+        recurrence_group_id: task.recurrence_group_id,
+        cycle_members: task.cycle_members,
+      });
+    }
+
     setTasks(weekTasks ?? []);
-    setMembers(allMembers ?? []);
+    setMembers(allMembersList);
     setRecurringTasks(recurring ?? []);
     setExclusions(excls);
     setLoading(false);
