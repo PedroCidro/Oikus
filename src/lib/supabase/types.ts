@@ -25,6 +25,7 @@ export type Tarefa = {
   due_date: string | null;
   status: "pending" | "pending_approval" | "completed" | "missed";
   created_by: string;
+  assigned_pool: string[];
   is_recurring: boolean;
   recurrence_group_id: string | null;
   cycle_members: boolean;

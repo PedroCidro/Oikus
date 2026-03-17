@@ -38,6 +38,7 @@ CREATE TABLE tarefas (
   due_date      DATE,
   status        TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'pending_approval', 'completed', 'missed')),
   created_by    UUID REFERENCES perfis(id) NOT NULL,
+  assigned_pool UUID[] DEFAULT '{}',
   is_recurring  BOOLEAN NOT NULL DEFAULT false,
   recurrence_group_id UUID,
   cycle_members BOOLEAN NOT NULL DEFAULT false,

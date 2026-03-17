@@ -113,16 +113,18 @@ export default function PlanejadorPage() {
         const taskExclusions = excls
           .filter((e) => e.recurrence_group_id === task.recurrence_group_id)
           .map((e) => e.user_id);
-        const eligible = allMembersList
-          .filter((m) => !taskExclusions.includes(m.id))
-          .sort((a, b) => a.created_at.localeCompare(b.created_at));
+
+        // Use assigned_pool if set, otherwise fall back to all members
+        const pool = task.assigned_pool && task.assigned_pool.length > 0
+          ? task.assigned_pool
+          : allMembersList.map((m) => m.id);
+
+        const eligible = pool.filter((id) => !taskExclusions.includes(id));
 
         if (eligible.length > 0) {
-          const currentIdx = eligible.findIndex(
-            (m) => m.id === task.assigned_to
-          );
+          const currentIdx = eligible.indexOf(task.assigned_to);
           const nextIdx = (currentIdx + 1) % eligible.length;
-          nextAssignee = eligible[nextIdx].id;
+          nextAssignee = eligible[nextIdx];
         }
       }
 
@@ -131,6 +133,7 @@ export default function PlanejadorPage() {
         title: task.title,
         description: task.description,
         assigned_to: nextAssignee,
+        assigned_pool: task.assigned_pool ?? [],
         due_date: nextDueStr,
         created_by: task.created_by,
         is_recurring: true,
