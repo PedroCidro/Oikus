@@ -113,7 +113,15 @@ export default function TarefasPage() {
             <TaskRow
               key={task.id}
               task={task}
-              assignee={task.assigned_to ? memberMap[task.assigned_to] : null}
+              assignees={
+                task.assigned_pool && task.assigned_pool.length > 0
+                  ? task.assigned_pool
+                      .map((id) => memberMap[id])
+                      .filter(Boolean)
+                  : task.assigned_to && memberMap[task.assigned_to]
+                    ? [memberMap[task.assigned_to]]
+                    : []
+              }
               isAdmin={isAdmin}
               requireApproval={requireApproval}
               onUpdate={fetchData}

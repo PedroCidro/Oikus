@@ -31,7 +31,7 @@ export function CreateTaskModal({
   const [cycleMembers, setCycleMembers] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const showPool = isAdmin && isRecurring && cycleMembers;
+  const showPool = isAdmin;
 
   function togglePoolMember(id: string) {
     setAssignedPool((prev) =>
@@ -43,8 +43,8 @@ export function CreateTaskModal({
     e.preventDefault();
     setLoading(true);
 
-    const pool = showPool ? assignedPool : [];
-    const firstAssignee = showPool && pool.length > 0 ? pool[0] : assignedTo || null;
+    const pool = assignedPool.length > 0 ? assignedPool : assignedTo ? [assignedTo] : [];
+    const firstAssignee = pool.length > 0 ? pool[0] : null;
 
     const supabase = createClient();
     await supabase.from("tarefas").insert({
@@ -110,7 +110,7 @@ export function CreateTaskModal({
           {showPool ? (
             <div>
               <label className="block text-[13px] font-medium text-text-secondary mb-1.5">
-                Membros no revezamento
+                Responsáveis
               </label>
               <div className="flex flex-wrap gap-2">
                 {members.map((m) => {

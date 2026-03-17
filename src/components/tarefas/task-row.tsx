@@ -19,13 +19,13 @@ function getTimeProgress(task: Tarefa): number | null {
 
 export function TaskRow({
   task,
-  assignee,
+  assignees,
   isAdmin,
   requireApproval,
   onUpdate,
 }: {
   task: Tarefa;
-  assignee?: Perfil | null;
+  assignees: Perfil[];
   isAdmin: boolean;
   requireApproval: boolean;
   onUpdate: () => void;
@@ -88,11 +88,15 @@ export function TaskRow({
             {task.title}
           </p>
           <div className="flex items-center gap-2 mt-1">
-            {assignee && (
+            {assignees.length > 0 && (
               <div className="flex items-center gap-1">
-                <Avatar name={assignee.name} userId={assignee.id} size={16} />
+                <div className="flex -space-x-1">
+                  {assignees.map((a) => (
+                    <Avatar key={a.id} name={a.name} userId={a.id} size={16} />
+                  ))}
+                </div>
                 <span className="text-text-secondary text-[12px]">
-                  {assignee.name.split(" ")[0]}
+                  {assignees.map((a) => a.name.split(" ")[0]).join(", ")}
                 </span>
               </div>
             )}
