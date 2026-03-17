@@ -28,6 +28,7 @@ export function MemberRow({
           {marcaCount} {marcaCount === 1 ? "marca" : "marcas"} este mês
         </p>
       </div>
+      <Badge variant={perfil.role} />
       {isAdmin && !isSelf && (
         <div className="flex items-center gap-2">
           <button
@@ -44,7 +45,6 @@ export function MemberRow({
           </button>
         </div>
       )}
-      {(!isAdmin || isSelf) && <Badge variant={perfil.role} />}
     </div>
   );
 }
