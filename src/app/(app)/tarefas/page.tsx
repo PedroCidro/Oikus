@@ -6,6 +6,7 @@ import { FilterChips } from "@/components/ui/filter-chips";
 import { TaskRow } from "@/components/tarefas/task-row";
 import { CreateTaskModal } from "@/components/tarefas/create-task-modal";
 import { Button } from "@/components/ui/button";
+import { getMonthName } from "@/lib/utils";
 import type { Tarefa, Perfil, Casa } from "@/lib/supabase/types";
 
 const FILTERS = ["Todas", "Minhas", "Pendentes", "Feitas"];
@@ -93,6 +94,8 @@ export default function TarefasPage() {
         <Button onClick={() => setShowModal(true)}>+ Nova</Button>
       </div>
 
+      <MonthProgress tasks={tasks} />
+
       <FilterChips options={FILTERS} active={filter} onChange={setFilter} />
 
       <div className="mt-4 divide-y divide-surface-dim">
@@ -124,5 +127,63 @@ export default function TarefasPage() {
         />
       )}
     </main>
+  );
+}
+
+function MonthProgress({ tasks }: { tasks: Tarefa[] }) {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+
+  const monthTasks = tasks.filter((t) => {
+    const d = new Date(t.created_at);
+    return d.getMonth() + 1 === month && d.getFullYear() === year;
+  });
+
+  const total = monthTasks.length;
+  if (total === 0) return null;
+
+  const completed = monthTasks.filter((t) => t.status === "completed").length;
+  const pct = total > 0 ? completed / total : 0;
+
+  // Days elapsed in the month
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const daysPct = now.getDate() / daysInMonth;
+
+  return (
+    <div className="bg-surface rounded-2xl p-4 mb-4">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[13px] font-semibold text-text-secondary">
+          {getMonthName(month)}
+        </span>
+        <span className="text-[13px] font-bold">
+          {completed}/{total} tarefas
+        </span>
+      </div>
+      <div className="h-2 rounded-full bg-surface-dim overflow-hidden relative">
+        <div
+          className="absolute inset-y-0 left-0 border-r-2 border-text-secondary/30"
+          style={{ width: `${daysPct * 100}%` }}
+        />
+        <div
+          className={`h-full rounded-full transition-all relative z-10 ${
+            pct >= 1
+              ? "bg-success"
+              : pct >= 0.5
+                ? "bg-accent"
+                : "bg-warning"
+          }`}
+          style={{ width: `${pct * 100}%` }}
+        />
+      </div>
+      <div className="flex items-center justify-between mt-1.5">
+        <span className="text-[11px] text-text-secondary">
+          {Math.round(pct * 100)}% concluído
+        </span>
+        <span className="text-[11px] text-text-secondary">
+          Dia {now.getDate()}/{daysInMonth}
+        </span>
+      </div>
+    </div>
   );
 }
