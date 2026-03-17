@@ -55,6 +55,36 @@ export function getTaskBadgeVariant(
   return "pendente";
 }
 
+const MEMBER_COLORS = [
+  "#C4653A", "#5B8A72", "#7B6BA8", "#2D8C9E",
+  "#B8860B", "#D4453A", "#5B6ABF", "#8B5E3C",
+  "#3A8F7C", "#C44A8B",
+];
+
+export function getMemberColor(userId: string): string {
+  let hash = 0;
+  for (let i = 0; i < userId.length; i++) {
+    hash = ((hash << 5) - hash + userId.charCodeAt(i)) | 0;
+  }
+  return MEMBER_COLORS[Math.abs(hash) % MEMBER_COLORS.length];
+}
+
+export function getWeekBounds(referenceDate: Date): { monday: Date; sunday: Date } {
+  const d = new Date(referenceDate);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay();
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  const monday = new Date(d);
+  monday.setDate(d.getDate() + diffToMonday);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  return { monday, sunday };
+}
+
+export function formatDateShort(date: Date): string {
+  return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+}
+
 export function generateInviteCode(): string {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }

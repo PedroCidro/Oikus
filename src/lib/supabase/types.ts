@@ -25,6 +25,9 @@ export type Tarefa = {
   due_date: string | null;
   status: "pending" | "pending_approval" | "completed" | "missed";
   created_by: string;
+  is_recurring: boolean;
+  recurrence_group_id: string | null;
+  cycle_members: boolean;
   created_at: string;
   completed_at: string | null;
 };
@@ -71,6 +74,14 @@ export type Voto = {
   created_at: string;
 };
 
+export type CicloExclusao = {
+  id: string;
+  house_id: string;
+  recurrence_group_id: string;
+  user_id: string;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -114,6 +125,12 @@ export type Database = {
         Row: Voto;
         Insert: Partial<Voto> & Pick<Voto, "trial_id" | "voter_id" | "vote">;
         Update: Partial<Voto>;
+        Relationships: [];
+      };
+      ciclo_exclusoes: {
+        Row: CicloExclusao;
+        Insert: Partial<CicloExclusao> & Pick<CicloExclusao, "house_id" | "recurrence_group_id" | "user_id">;
+        Update: Partial<CicloExclusao>;
         Relationships: [];
       };
     };

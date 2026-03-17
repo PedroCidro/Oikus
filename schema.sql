@@ -38,8 +38,21 @@ CREATE TABLE tarefas (
   due_date      DATE,
   status        TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'pending_approval', 'completed', 'missed')),
   created_by    UUID REFERENCES perfis(id) NOT NULL,
+  is_recurring  BOOLEAN NOT NULL DEFAULT false,
+  recurrence_group_id UUID,
+  cycle_members BOOLEAN NOT NULL DEFAULT false,
   created_at    TIMESTAMPTZ DEFAULT now(),
   completed_at  TIMESTAMPTZ
+);
+
+-- 8. Exclusões do ciclo de revezamento
+CREATE TABLE ciclo_exclusoes (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  house_id            UUID REFERENCES casas(id) NOT NULL,
+  recurrence_group_id UUID NOT NULL,
+  user_id             UUID REFERENCES perfis(id) NOT NULL,
+  created_at          TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(recurrence_group_id, user_id)
 );
 
 -- 4. Marcas (penalidades por tarefas não cumpridas)

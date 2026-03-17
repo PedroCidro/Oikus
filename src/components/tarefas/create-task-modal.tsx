@@ -3,18 +3,21 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
 import type { Perfil } from "@/lib/supabase/types";
 
 export function CreateTaskModal({
   houseId,
   members,
   userId,
+  isAdmin,
   onClose,
   onCreated,
 }: {
   houseId: string;
   members: Perfil[];
   userId: string;
+  isAdmin: boolean;
   onClose: () => void;
   onCreated: () => void;
 }) {
@@ -22,6 +25,8 @@ export function CreateTaskModal({
   const [description, setDescription] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [cycleMembers, setCycleMembers] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -36,6 +41,9 @@ export function CreateTaskModal({
       assigned_to: assignedTo || null,
       due_date: dueDate || null,
       created_by: userId,
+      is_recurring: isRecurring,
+      recurrence_group_id: isRecurring ? crypto.randomUUID() : null,
+      cycle_members: isRecurring && cycleMembers,
     });
 
     onCreated();
@@ -114,6 +122,21 @@ export function CreateTaskModal({
               className="w-full rounded-xl border border-surface-dim bg-surface px-4 py-3 text-[15px] outline-none focus:border-accent transition-colors"
             />
           </div>
+
+          {isAdmin && (
+            <div className="space-y-3 pt-2 border-t border-surface-dim">
+              <div className="flex items-center justify-between">
+                <span className="text-[15px] font-medium">Repete semanalmente</span>
+                <Toggle checked={isRecurring} onChange={setIsRecurring} />
+              </div>
+              {isRecurring && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[15px] font-medium">Revezar os membros</span>
+                  <Toggle checked={cycleMembers} onChange={setCycleMembers} />
+                </div>
+              )}
+            </div>
+          )}
 
           <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Criando..." : "Criar tarefa"}

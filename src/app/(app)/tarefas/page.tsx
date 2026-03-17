@@ -6,6 +6,7 @@ import { FilterChips } from "@/components/ui/filter-chips";
 import { TaskRow } from "@/components/tarefas/task-row";
 import { CreateTaskModal } from "@/components/tarefas/create-task-modal";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { getMonthName } from "@/lib/utils";
 import type { Tarefa, Perfil, Casa } from "@/lib/supabase/types";
 
@@ -91,7 +92,15 @@ export default function TarefasPage() {
     <main className="px-5 pt-14 pb-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-[28px] font-bold">Tarefas</h1>
-        <Button onClick={() => setShowModal(true)}>+ Nova</Button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/tarefas/planejador"
+            className="text-accent text-[13px] font-semibold"
+          >
+            Planejador
+          </Link>
+          <Button onClick={() => setShowModal(true)}>+ Nova</Button>
+        </div>
       </div>
 
       <MonthProgress tasks={tasks} />
@@ -122,6 +131,7 @@ export default function TarefasPage() {
           houseId={houseId}
           members={members}
           userId={userId}
+          isAdmin={isAdmin}
           onClose={() => setShowModal(false)}
           onCreated={fetchData}
         />
