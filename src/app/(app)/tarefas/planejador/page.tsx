@@ -83,9 +83,14 @@ export default function PlanejadorPage() {
       excls = data ?? [];
     }
 
-    // Spawn next-week instances for recurring tasks
+    // Only spawn next-week instances when viewing the current real week
     const allMembersList = allMembers ?? [];
-    for (const task of recurring ?? []) {
+    const realWeek = getWeekBounds(new Date());
+    const isCurrentWeek =
+      monday.toISOString().split("T")[0] ===
+      realWeek.monday.toISOString().split("T")[0];
+
+    for (const task of isCurrentWeek ? (recurring ?? []) : []) {
       if (!task.due_date || !task.recurrence_group_id) continue;
 
       const nextDueDate = new Date(task.due_date + "T00:00:00");
