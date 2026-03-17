@@ -45,6 +45,22 @@ export default function ConfigPage() {
     load();
   }, []);
 
+  async function handleLeaveHouse() {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase
+      .from("perfis")
+      .update({ house_id: null, role: "morador" })
+      .eq("id", user.id);
+
+    router.push("/onboarding");
+    router.refresh();
+  }
+
   async function handleLogout() {
     const supabase = createClient();
     await supabase.auth.signOut();
@@ -114,7 +130,7 @@ export default function ConfigPage() {
           Conta
         </h2>
         <div className="divide-y divide-surface-dim">
-          <SettingsRow label="Sair da república" danger />
+          <SettingsRow label="Sair da república" onClick={handleLeaveHouse} danger />
           <SettingsRow
             label="Sair da conta"
             onClick={handleLogout}

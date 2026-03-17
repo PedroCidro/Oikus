@@ -172,6 +172,7 @@ $$;
 -- Casas
 ALTER TABLE casas ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "casas_select" ON casas FOR SELECT USING (id = private.get_my_house_id());
+CREATE POLICY "casas_select_by_invite" ON casas FOR SELECT USING (invite_code IS NOT NULL AND (select auth.uid()) IS NOT NULL);
 CREATE POLICY "casas_insert" ON casas FOR INSERT WITH CHECK ((select auth.uid()) IS NOT NULL);
 CREATE POLICY "casas_update" ON casas FOR UPDATE USING (id = private.get_my_house_id() AND private.is_house_admin());
 
