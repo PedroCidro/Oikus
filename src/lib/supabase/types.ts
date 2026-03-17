@@ -11,7 +11,7 @@ export type Perfil = {
   email: string;
   avatar_url: string | null;
   house_id: string | null;
-  role: "admin" | "morador";
+  role: "admin" | "membro";
   created_at: string;
 };
 

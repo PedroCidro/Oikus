@@ -54,7 +54,7 @@ export default function ConfigPage() {
 
     await supabase
       .from("perfis")
-      .update({ house_id: null, role: "morador" })
+      .update({ house_id: null, role: "membro" })
       .eq("id", user.id);
 
     router.push("/onboarding");

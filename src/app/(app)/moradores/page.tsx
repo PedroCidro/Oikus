@@ -70,7 +70,7 @@ export default function MoradoresPage() {
 
   async function handleToggleRole(member: Perfil) {
     const supabase = createClient();
-    const newRole = member.role === "admin" ? "morador" : "admin";
+    const newRole = member.role === "admin" ? "membro" : "admin";
     await supabase
       .from("perfis")
       .update({ role: newRole })

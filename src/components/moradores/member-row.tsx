@@ -40,7 +40,7 @@ export function MemberRow({
             onClick={onToggleRole}
             className="text-[12px] font-semibold text-accent bg-accent-light px-2.5 py-1 rounded-full hover:bg-accent/20 transition-colors"
           >
-            {perfil.role === "morador" ? "Promover" : "Rebaixar"}
+            {perfil.role === "membro" ? "Promover" : "Rebaixar"}
           </button>
         </div>
       )}

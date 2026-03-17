@@ -6,7 +6,7 @@ const BADGE_STYLES: Record<string, string> = {
   punido: "bg-danger-light text-danger",
   safe: "bg-success-light text-success",
   admin: "bg-accent-light text-accent",
-  morador: "bg-surface text-text-secondary",
+  membro: "bg-surface text-text-secondary",
 };
 
 export function Badge({ variant }: { variant: string }) {

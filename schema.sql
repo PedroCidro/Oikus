@@ -23,7 +23,7 @@ CREATE TABLE perfis (
   email       TEXT UNIQUE NOT NULL,
   avatar_url  TEXT,
   house_id    UUID REFERENCES casas(id),
-  role        TEXT NOT NULL DEFAULT 'morador' CHECK (role IN ('admin', 'morador')),
+  role        TEXT NOT NULL DEFAULT 'membro' CHECK (role IN ('admin', 'membro')),
   created_at  TIMESTAMPTZ DEFAULT now()
 );
 
