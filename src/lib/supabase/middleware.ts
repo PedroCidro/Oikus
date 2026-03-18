@@ -26,26 +26,29 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  // Use getSession() instead of getUser() — reads cookie locally (~0ms)
+  // instead of calling Supabase Auth API (~250ms). Still refreshes expired
+  // tokens. JWT signing protects against tampering.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
   const { pathname } = request.nextUrl;
   const isAuthPage = pathname === "/login" || pathname === "/signup";
 
   // Not logged in → redirect to login (unless already on auth page)
-  if (!user && !isAuthPage) {
+  if (!session && !isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
   // Logged in on auth page → check house to decide redirect
-  if (user && isAuthPage) {
+  if (session && isAuthPage) {
     const { data: perfil } = await supabase
       .from("perfis")
       .select("house_id")
-      .eq("id", user.id)
+      .eq("id", session.user.id)
       .single<Pick<Perfil, "house_id">>();
 
     const url = request.nextUrl.clone();
@@ -53,6 +56,5 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // All other routes: auth is valid, house check handled by (app)/layout
   return supabaseResponse;
 }
