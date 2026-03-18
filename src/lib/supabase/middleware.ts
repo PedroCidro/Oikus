@@ -32,7 +32,6 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   const isAuthPage = pathname === "/login" || pathname === "/signup";
-  const isOnboarding = pathname === "/onboarding";
 
   // Not logged in → redirect to login (unless already on auth page)
   if (!user && !isAuthPage) {
@@ -41,7 +40,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Logged in on auth page → check house and redirect
+  // Logged in on auth page → check house to decide redirect
   if (user && isAuthPage) {
     const { data: perfil } = await supabase
       .from("perfis")
@@ -54,20 +53,6 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Logged in, not on onboarding or auth → check if they have a house
-  if (user && !isAuthPage && !isOnboarding) {
-    const { data: perfil } = await supabase
-      .from("perfis")
-      .select("house_id")
-      .eq("id", user.id)
-      .single<Pick<Perfil, "house_id">>();
-
-    if (!perfil?.house_id) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/onboarding";
-      return NextResponse.redirect(url);
-    }
-  }
-
+  // All other routes: auth is valid, house check handled by (app)/layout
   return supabaseResponse;
 }

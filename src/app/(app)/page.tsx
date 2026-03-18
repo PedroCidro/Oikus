@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser, getSupabase } from "@/lib/supabase/queries";
 import { getGreeting, getMonthName } from "@/lib/utils";
 import { SummaryCards } from "@/components/home/summary-cards";
 import { TaskPreview } from "@/components/home/task-preview";
@@ -7,61 +7,52 @@ import Link from "next/link";
 import type { Perfil, Tarefa, Marca } from "@/lib/supabase/types";
 
 export default async function HomePage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: perfil } = await supabase
-    .from("perfis")
-    .select("*")
-    .eq("id", user!.id)
-    .single<Perfil>();
+  const { user, perfil } = await getCurrentUser();
+  const supabase = await getSupabase();
 
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
 
-  // Pending tasks for the house
-  const { data: pendingTasks } = await supabase
-    .from("tarefas")
-    .select("*")
-    .eq("house_id", perfil!.house_id!)
-    .eq("status", "pending")
-    .order("due_date", { ascending: true, nullsFirst: false })
-    .limit(3)
-    .returns<Tarefa[]>();
-
-  // Total pending count
-  const { count: pendingCount } = await supabase
-    .from("tarefas")
-    .select("*", { count: "exact", head: true })
-    .eq("house_id", perfil!.house_id!)
-    .eq("status", "pending");
-
-  // Marca count for current user this month
-  const { count: marcaCount } = await supabase
-    .from("marcas")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user!.id)
-    .eq("month", month)
-    .eq("year", year);
-
-  // Leaderboard: all members with marca counts
-  const { data: members } = await supabase
-    .from("perfis")
-    .select("*")
-    .eq("house_id", perfil!.house_id!)
-    .returns<Perfil[]>();
-
-  const { data: allMarcas } = await supabase
-    .from("marcas")
-    .select("user_id")
-    .eq("house_id", perfil!.house_id!)
-    .eq("month", month)
-    .eq("year", year)
-    .returns<Pick<Marca, "user_id">[]>();
+  const [
+    { data: pendingTasks },
+    { count: pendingCount },
+    { count: marcaCount },
+    { data: members },
+    { data: allMarcas },
+  ] = await Promise.all([
+    supabase
+      .from("tarefas")
+      .select("*")
+      .eq("house_id", perfil!.house_id!)
+      .eq("status", "pending")
+      .order("due_date", { ascending: true, nullsFirst: false })
+      .limit(3)
+      .returns<Tarefa[]>(),
+    supabase
+      .from("tarefas")
+      .select("*", { count: "exact", head: true })
+      .eq("house_id", perfil!.house_id!)
+      .eq("status", "pending"),
+    supabase
+      .from("marcas")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user!.id)
+      .eq("month", month)
+      .eq("year", year),
+    supabase
+      .from("perfis")
+      .select("*")
+      .eq("house_id", perfil!.house_id!)
+      .returns<Perfil[]>(),
+    supabase
+      .from("marcas")
+      .select("user_id")
+      .eq("house_id", perfil!.house_id!)
+      .eq("month", month)
+      .eq("year", year)
+      .returns<Pick<Marca, "user_id">[]>(),
+  ]);
 
   const marcaCounts: Record<string, number> = {};
   allMarcas?.forEach((m) => {

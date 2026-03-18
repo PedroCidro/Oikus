@@ -1,51 +1,40 @@
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser, getSupabase } from "@/lib/supabase/queries";
 import { getMonthName } from "@/lib/utils";
 import { TribunalCard } from "@/components/tribunal/tribunal-card";
 import type { Perfil, Periodo, Marca } from "@/lib/supabase/types";
 
 export default async function TribunalPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: perfil } = await supabase
-    .from("perfis")
-    .select("*")
-    .eq("id", user!.id)
-    .single<Perfil>();
+  const { perfil } = await getCurrentUser();
+  const supabase = await getSupabase();
 
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
 
-  // Get threshold from periodos or default to 3
-  const { data: periodo } = await supabase
-    .from("periodos")
-    .select("threshold")
-    .eq("house_id", perfil!.house_id!)
-    .eq("month", month)
-    .eq("year", year)
-    .single<Pick<Periodo, "threshold">>();
+  const [{ data: periodo }, { data: members }, { data: marcas }] =
+    await Promise.all([
+      supabase
+        .from("periodos")
+        .select("threshold")
+        .eq("house_id", perfil!.house_id!)
+        .eq("month", month)
+        .eq("year", year)
+        .single<Pick<Periodo, "threshold">>(),
+      supabase
+        .from("perfis")
+        .select("*")
+        .eq("house_id", perfil!.house_id!)
+        .returns<Perfil[]>(),
+      supabase
+        .from("marcas")
+        .select("user_id")
+        .eq("house_id", perfil!.house_id!)
+        .eq("month", month)
+        .eq("year", year)
+        .returns<Pick<Marca, "user_id">[]>(),
+    ]);
 
   const threshold = periodo?.threshold ?? 3;
-
-  // All house members
-  const { data: members } = await supabase
-    .from("perfis")
-    .select("*")
-    .eq("house_id", perfil!.house_id!)
-    .returns<Perfil[]>();
-
-  // All marcas for this month
-  const { data: marcas } = await supabase
-    .from("marcas")
-    .select("user_id")
-    .eq("house_id", perfil!.house_id!)
-    .eq("month", month)
-    .eq("year", year)
-    .returns<Pick<Marca, "user_id">[]>();
 
   const marcaCounts: Record<string, number> = {};
   marcas?.forEach((m) => {

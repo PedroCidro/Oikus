@@ -1,13 +1,15 @@
 "use client";
 
+import Link from "next/link";
+
 export function WeekNav({
   weekStart,
-  onPrev,
-  onNext,
+  prevWeek,
+  nextWeek,
 }: {
   weekStart: Date;
-  onPrev: () => void;
-  onNext: () => void;
+  prevWeek: string;
+  nextWeek: string;
 }) {
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekStart.getDate() + 6);
@@ -17,7 +19,7 @@ export function WeekNav({
 
   return (
     <div className="flex items-center justify-between px-5 pb-3">
-      <button onClick={onPrev} className="p-1 text-text-secondary">
+      <Link href={`/tarefas/planejador?week=${prevWeek}`} className="p-1 text-text-secondary">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path
             d="M11 4L5 9L11 14"
@@ -27,11 +29,11 @@ export function WeekNav({
             strokeLinejoin="round"
           />
         </svg>
-      </button>
+      </Link>
       <span className="text-[15px] font-semibold">
         {fmt(weekStart)} – {fmt(weekEnd)} {month}
       </span>
-      <button onClick={onNext} className="p-1 text-text-secondary">
+      <Link href={`/tarefas/planejador?week=${nextWeek}`} className="p-1 text-text-secondary">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path
             d="M7 4L13 9L7 14"
@@ -41,7 +43,7 @@ export function WeekNav({
             strokeLinejoin="round"
           />
         </svg>
-      </button>
+      </Link>
     </div>
   );
 }
