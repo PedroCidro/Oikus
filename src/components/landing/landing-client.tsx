@@ -119,12 +119,12 @@ export function LandingClient() {
       </header>
 
       {/* Hero */}
-      <section className="relative pt-16 md:pt-24 pb-32 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="relative pt-10 md:pt-16 pb-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="flex flex-col gap-8">
             <h1
               data-hero-title
-              className="font-heading text-5xl md:text-[5.5rem] font-bold leading-[1.05] tracking-[-0.03em]"
+              className="font-heading text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.08] tracking-[-0.03em]"
             >
               {heroWords.map((word, i) => (
                 <span key={i} className="inline-block overflow-hidden">
@@ -137,7 +137,7 @@ export function LandingClient() {
             </h1>
             <p
               data-hero-sub
-              className="text-lg md:text-xl text-text-secondary leading-relaxed max-w-lg"
+              className="text-base md:text-lg text-text-secondary leading-relaxed max-w-lg"
             >
               Organiza as tarefas da rep, registra quem não fez a parte
               e deixa os moradores resolverem por votação.
@@ -160,70 +160,70 @@ export function LandingClient() {
 
           {/* Phone mockup — real app UI */}
           <div className="relative hidden lg:block" data-mockup>
-            <div className="w-[360px] mx-auto rounded-[3rem] border-[16px] border-white shadow-2xl overflow-hidden relative bg-background">
-              <div className="px-6 pt-9 pb-5 flex flex-col gap-5 text-[14px]">
+            <div className="w-[300px] mx-auto rounded-[2.5rem] border-[14px] border-white shadow-2xl overflow-hidden relative bg-background">
+              <div className="px-4 pt-7 pb-3 flex flex-col gap-3 text-[12px]">
                 {/* Header */}
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-text-secondary">Rep. Solar</p>
-                  <p className="font-heading text-[26px] font-bold leading-tight">Bom dia, Pedro</p>
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.05em] text-text-secondary">Rep. Solar</p>
+                  <p className="font-heading text-[20px] font-bold leading-tight">Bom dia, Pedro</p>
                 </div>
                 {/* Summary cards */}
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="bg-surface rounded-xl p-3">
-                    <span className="text-[24px] font-bold text-success font-heading">3</span>
-                    <p className="text-[11px] font-medium text-text-secondary mt-0.5">Tarefas ativas</p>
+                    <span className="text-[18px] font-bold text-success font-heading">3</span>
+                    <p className="text-[9px] font-medium text-text-secondary">Tarefas ativas</p>
                   </div>
                   <div className="bg-surface rounded-xl p-3">
-                    <span className="text-[24px] font-bold text-text-primary font-heading">1</span>
-                    <p className="text-[11px] font-medium text-text-secondary mt-0.5">Marcas este mês</p>
+                    <span className="text-[18px] font-bold text-text-primary font-heading">1</span>
+                    <p className="text-[9px] font-medium text-text-secondary">Marcas este mês</p>
                   </div>
                 </div>
                 {/* Tasks */}
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="font-heading font-bold text-[16px]">Suas tarefas</span>
-                    <span className="text-[11px] text-accent font-semibold">Ver todas</span>
+                    <span className="font-heading font-bold text-[12px]">Suas tarefas</span>
+                    <span className="text-[9px] text-accent font-semibold">Ver todas</span>
                   </div>
                   <div className="flex flex-col divide-y divide-surface-dim">
                     <div className="flex items-center justify-between py-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded border-2 border-surface-dim shrink-0" />
+                        <div className="w-4 h-4 rounded border-2 border-surface-dim shrink-0" />
                         <div>
-                          <p className="text-[14px] font-semibold">Limpar cozinha</p>
-                          <p className="text-[10px] text-text-secondary">Vence amanhã</p>
+                          <p className="text-[11px] font-semibold">Limpar cozinha</p>
+                          <p className="text-[8px] text-text-secondary">Vence amanhã</p>
                         </div>
                       </div>
-                      <span className="text-[9px] font-bold text-accent bg-accent/10 px-2.5 py-1 rounded-full shrink-0">URGENTE</span>
+                      <span className="text-[7px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full shrink-0">URGENTE</span>
                     </div>
                     <div className="flex items-center justify-between py-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded border-2 border-surface-dim shrink-0" />
+                        <div className="w-4 h-4 rounded border-2 border-surface-dim shrink-0" />
                         <div>
-                          <p className="text-[14px] font-semibold">Comprar papel higiênico</p>
-                          <p className="text-[10px] text-text-secondary">Vence em 3 dias</p>
+                          <p className="text-[11px] font-semibold">Comprar papel higiênico</p>
+                          <p className="text-[8px] text-text-secondary">Vence em 3 dias</p>
                         </div>
                       </div>
-                      <span className="text-[9px] font-bold text-text-secondary bg-surface-dim px-2.5 py-1 rounded-full shrink-0">PENDENTE</span>
+                      <span className="text-[7px] font-bold text-text-secondary bg-surface-dim px-2 py-0.5 rounded-full shrink-0">PENDENTE</span>
                     </div>
                     <div className="flex items-center justify-between py-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded bg-success flex items-center justify-center shrink-0">
-                          <svg width="12" height="12" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        <div className="w-4 h-4 rounded bg-success flex items-center justify-center shrink-0">
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         </div>
                         <div>
-                          <p className="text-[14px] font-semibold text-text-secondary line-through">Lavar banheiro</p>
-                          <p className="text-[10px] text-text-secondary">Concluída ontem</p>
+                          <p className="text-[11px] font-semibold text-text-secondary line-through">Lavar banheiro</p>
+                          <p className="text-[8px] text-text-secondary">Concluída ontem</p>
                         </div>
                       </div>
-                      <span className="text-[9px] font-bold text-success bg-success/10 px-2.5 py-1 rounded-full shrink-0">FEITA</span>
+                      <span className="text-[7px] font-bold text-success bg-success/10 px-2 py-0.5 rounded-full shrink-0">FEITA</span>
                     </div>
                   </div>
                 </div>
                 {/* Leaderboard */}
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="font-heading font-bold text-[16px]">Placar do mês</span>
-                    <span className="text-[12px] text-accent font-semibold">Março 2026</span>
+                    <span className="font-heading font-bold text-[12px]">Placar do mês</span>
+                    <span className="text-[9px] text-accent font-semibold">Março 2026</span>
                   </div>
                   <div className="flex flex-col divide-y divide-surface-dim">
                     {[
@@ -234,12 +234,12 @@ export function LandingClient() {
                     ].map((m) => (
                       <div key={m.name} className="flex items-center justify-between py-2">
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0" style={{ backgroundColor: m.color }}>
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0" style={{ backgroundColor: m.color }}>
                             {m.name[0]}
                           </div>
-                          <span className="text-[14px] font-semibold">{m.name}</span>
+                          <span className="text-[11px] font-semibold">{m.name}</span>
                         </div>
-                        <span className="text-[14px]"><strong className="text-accent">{m.marks}</strong> <span className="text-text-secondary">{m.marks === "1" ? "marca" : "marcas"}</span></span>
+                        <span className="text-[11px]"><strong className="text-accent">{m.marks}</strong> <span className="text-text-secondary">{m.marks === "1" ? "marca" : "marcas"}</span></span>
                       </div>
                     ))}
                   </div>

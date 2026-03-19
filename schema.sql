@@ -104,6 +104,31 @@ CREATE TABLE votos (
   UNIQUE(trial_id, voter_id)
 );
 
+-- 9. Eventos financeiros (agrupamento de transações por evento)
+CREATE TABLE eventos_financeiros (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  house_id    UUID REFERENCES casas(id) NOT NULL,
+  name        TEXT NOT NULL,
+  date        DATE NOT NULL,
+  created_by  UUID REFERENCES perfis(id) NOT NULL,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- 10. Transações financeiras (entradas e saídas)
+CREATE TABLE transacoes (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  house_id        UUID REFERENCES casas(id) NOT NULL,
+  type            TEXT NOT NULL CHECK (type IN ('entrada', 'saida')),
+  amount          NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+  description     TEXT NOT NULL,
+  category        TEXT NOT NULL CHECK (category IN ('gastos', 'fornecedores', 'lucro', 'pessoas')),
+  responsible_id  UUID REFERENCES perfis(id) NOT NULL,
+  evento_id       UUID REFERENCES eventos_financeiros(id),
+  date            DATE NOT NULL DEFAULT CURRENT_DATE,
+  created_by      UUID REFERENCES perfis(id) NOT NULL,
+  created_at      TIMESTAMPTZ DEFAULT now()
+);
+
 -- =====================
 -- ÍNDICES
 -- =====================
@@ -123,6 +148,12 @@ CREATE INDEX idx_tribunais_accuser ON tribunais(accuser_id);
 CREATE INDEX idx_tribunais_house_status ON tribunais(house_id, status);
 CREATE INDEX idx_votos_trial ON votos(trial_id);
 CREATE INDEX idx_votos_voter ON votos(voter_id);
+CREATE INDEX idx_eventos_financeiros_house ON eventos_financeiros(house_id);
+CREATE INDEX idx_transacoes_house ON transacoes(house_id);
+CREATE INDEX idx_transacoes_house_date ON transacoes(house_id, date);
+CREATE INDEX idx_transacoes_house_type ON transacoes(house_id, type);
+CREATE INDEX idx_transacoes_evento ON transacoes(evento_id);
+CREATE INDEX idx_transacoes_responsible ON transacoes(responsible_id);
 
 -- =====================
 -- TRIGGER: criação automática de perfil
@@ -226,3 +257,17 @@ CREATE POLICY "tribunais_update" ON tribunais FOR UPDATE USING (house_id = priva
 ALTER TABLE votos ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "votos_select" ON votos FOR SELECT USING (EXISTS (SELECT 1 FROM tribunais t WHERE t.id = votos.trial_id AND t.house_id = private.get_my_house_id()));
 CREATE POLICY "votos_insert" ON votos FOR INSERT WITH CHECK (voter_id = (select auth.uid()) AND EXISTS (SELECT 1 FROM tribunais t WHERE t.id = votos.trial_id AND t.house_id = private.get_my_house_id() AND t.status = 'open'));
+
+-- Eventos Financeiros
+ALTER TABLE eventos_financeiros ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "eventos_fin_select" ON eventos_financeiros FOR SELECT USING (house_id = private.get_my_house_id());
+CREATE POLICY "eventos_fin_insert" ON eventos_financeiros FOR INSERT WITH CHECK (house_id = private.get_my_house_id() AND created_by = (select auth.uid()));
+CREATE POLICY "eventos_fin_update" ON eventos_financeiros FOR UPDATE USING (house_id = private.get_my_house_id() AND (created_by = (select auth.uid()) OR private.is_house_admin()));
+CREATE POLICY "eventos_fin_delete" ON eventos_financeiros FOR DELETE USING (house_id = private.get_my_house_id() AND (created_by = (select auth.uid()) OR private.is_house_admin()));
+
+-- Transacoes
+ALTER TABLE transacoes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "transacoes_select" ON transacoes FOR SELECT USING (house_id = private.get_my_house_id());
+CREATE POLICY "transacoes_insert" ON transacoes FOR INSERT WITH CHECK (house_id = private.get_my_house_id() AND created_by = (select auth.uid()));
+CREATE POLICY "transacoes_update" ON transacoes FOR UPDATE USING (house_id = private.get_my_house_id() AND (created_by = (select auth.uid()) OR private.is_house_admin()));
+CREATE POLICY "transacoes_delete" ON transacoes FOR DELETE USING (house_id = private.get_my_house_id() AND (created_by = (select auth.uid()) OR private.is_house_admin()));

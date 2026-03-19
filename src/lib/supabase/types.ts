@@ -83,6 +83,29 @@ export type CicloExclusao = {
   created_at: string;
 };
 
+export type EventoFinanceiro = {
+  id: string;
+  house_id: string;
+  name: string;
+  date: string;
+  created_by: string;
+  created_at: string;
+};
+
+export type Transacao = {
+  id: string;
+  house_id: string;
+  type: "entrada" | "saida";
+  amount: number;
+  description: string;
+  category: "gastos" | "fornecedores" | "lucro" | "pessoas";
+  responsible_id: string;
+  evento_id: string | null;
+  date: string;
+  created_by: string;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -132,6 +155,18 @@ export type Database = {
         Row: CicloExclusao;
         Insert: Partial<CicloExclusao> & Pick<CicloExclusao, "house_id" | "recurrence_group_id" | "user_id">;
         Update: Partial<CicloExclusao>;
+        Relationships: [];
+      };
+      eventos_financeiros: {
+        Row: EventoFinanceiro;
+        Insert: Partial<EventoFinanceiro> & Pick<EventoFinanceiro, "house_id" | "name" | "date" | "created_by">;
+        Update: Partial<EventoFinanceiro>;
+        Relationships: [];
+      };
+      transacoes: {
+        Row: Transacao;
+        Insert: Partial<Transacao> & Pick<Transacao, "house_id" | "type" | "amount" | "description" | "category" | "responsible_id" | "created_by">;
+        Update: Partial<Transacao>;
         Relationships: [];
       };
     };
